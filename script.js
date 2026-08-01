@@ -9,24 +9,28 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
    side       : -1 = stage left, 1 = stage right (must mirror the
                 text-left / text-right classes set in index.html)
    frontTurn  : the base Y rotation (radians) that points this
-                model's FRONT fascia at the camera. Every source
-                GLB was modelled/exported with its own forward
-                axis, so this is tuned per file from visual
-                inspection. If a model ever shows its rear instead
-                of its front, add Math.PI to flip it end‑for‑end,
-                or flip the sign to mirror which way it turns.
+                model's FRONT fascia at the camera. Each source GLB
+                was authored with its own forward axis, so rather
+                than eyeballing it, this was derived by parsing each
+                file's actual node/material names and geometry —
+                locating the grille / license‑plate / bumper / boot
+                meshes and the wheelbase axis for each car — and
+                solving for the rotation that points that identified
+                front toward the camera. If a model ever still shows
+                its rear, add Math.PI here to flip it end‑for‑end.
    ============================================================ */
 const MODELS = [
-  { file: 'assets/models/2006-supercharged.glb', side: -1, frontTurn:  Math.PI / 2 },
-  { file: 'assets/models/2011-evoque.glb',        side:  1, frontTurn: -Math.PI / 2 },
-  { file: 'assets/models/velar.glb',              side: -1, frontTurn:  Math.PI / 2 },
-  { file: 'assets/models/sv-coupe.glb',           side:  1, frontTurn: -Math.PI / 2 },
+  { file: 'assets/models/2006-supercharged.glb', side: -1, frontTurn: Math.PI },
+  { file: 'assets/models/2011-evoque.glb',        side:  1, frontTurn: 0 },
+  { file: 'assets/models/velar.glb',              side: -1, frontTurn: Math.PI },
+  { file: 'assets/models/sv-coupe.glb',           side:  1, frontTurn: Math.PI / 2 },
 ];
 
-const TARGET_SIZE      = 3.55;   // normalized world-space size of the largest dimension — bigger, more commanding presence
-const SIDE_OFFSET       = 2.65;  // base lateral unit used to derive rest/active positions below
+const TARGET_SIZE      = 4.1;    // normalized world-space size of the largest dimension — bigger, more commanding presence
+const SIDE_OFFSET       = 2.75;  // base lateral unit used to derive rest/active positions below
 const REST_MULTIPLIER   = 2.2;   // idle position multiplier — pushes the model fully off‑screen to the side
-const ACTIVE_MULTIPLIER = 0.92;  // active position multiplier — still "toward the side", out of the text's way
+const ACTIVE_MULTIPLIER = 0.86;  // active position multiplier — still "toward the side", out of the text's way
+const VISIBLE_THRESHOLD = 0.02;  // below this weight the car is fully hidden — only the active/entering model ever renders
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = THREE.MathUtils.lerp;
@@ -36,8 +40,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 /* ---------------- Renderer / scene / camera ---------------- */
 
 const canvas = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.96; // slightly crushed — a closed garage, not a showroom
@@ -45,7 +49,7 @@ renderer.toneMappingExposure = 0.96; // slightly crushed — a closed garage, no
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.4, 9.4);
+camera.position.set(0, 0.4, 10.6);
 camera.lookAt(0, -0.15, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -147,6 +151,17 @@ function collectMaterials(root) {
       obj.material.transparent = false;
       obj.material.opacity = 1;
       if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.15;
+      // reduced texture quality in exchange for smoother scrolling
+      ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap'].forEach((slot) => {
+        const tex = obj.material[slot];
+        if (tex) {
+          tex.anisotropy = 1;
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+        }
+      });
+      obj.castShadow = false;
+      obj.receiveShadow = false;
       obj.frustumCulled = false;
       mats.push(obj.material);
     }
@@ -336,6 +351,10 @@ function animate() {
 
     // fully opaque always — the transition is a slide, never a fade
     rig.shadowMat.opacity = lerp(rig.shadowMat.opacity, w * 0.85, 1 - Math.pow(0.001, delta));
+
+    // the car only ever appears on screen while its info panel is showing (or sliding in/out) —
+    // everything else is skipped entirely, which is also a big chunk of the render cost saved
+    rig.outer.visible = w > VISIBLE_THRESHOLD;
   });
 
   renderer.render(scene, camera);
