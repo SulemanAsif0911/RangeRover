@@ -5,18 +5,29 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 /* ============================================================
    CONFIG — one entry per model, in chronological order.
-   side : -1 = stage left, 1 = stage right (must mirror the
-          text-left / text-right classes set in index.html)
+
+   side       : -1 = stage left, 1 = stage right (must mirror the
+                text-left / text-right classes set in index.html)
+   frontTurn  : the base Y rotation (radians) that points this
+                model's FRONT fascia at the camera. Every source
+                GLB was modelled/exported with its own forward
+                axis, so this is tuned per file from visual
+                inspection. If a model ever shows its rear instead
+                of its front, add Math.PI to flip it end‑for‑end,
+                or flip the sign to mirror which way it turns.
    ============================================================ */
 const MODELS = [
-  { file: 'assets/models/2006-supercharged.glb', side: -1, facing:  0.35 },
-  { file: 'assets/models/2011-evoque.glb',        side:  1, facing: -0.35 },
-  { file: 'assets/models/velar.glb',              side: -1, facing:  0.35 },
-  { file: 'assets/models/sv-coupe.glb',           side:  1, facing: -0.35 },
+  { file: 'assets/models/2006-supercharged.glb', side: -1, frontTurn:  Math.PI / 2 },
+  { file: 'assets/models/2011-evoque.glb',        side:  1, frontTurn: -Math.PI / 2 },
+  { file: 'assets/models/velar.glb',              side: -1, frontTurn:  Math.PI / 2 },
+  { file: 'assets/models/sv-coupe.glb',           side:  1, frontTurn: -Math.PI / 2 },
 ];
 
-const TARGET_SIZE = 2.7;      // normalized world-space size of the largest dimension
-const SIDE_OFFSET = 2.35;     // how far off-centre a resting model sits
+const TARGET_SIZE      = 3.55;   // normalized world-space size of the largest dimension — bigger, more commanding presence
+const SIDE_OFFSET       = 2.65;  // base lateral unit used to derive rest/active positions below
+const REST_MULTIPLIER   = 2.2;   // idle position multiplier — pushes the model fully off‑screen to the side
+const ACTIVE_MULTIPLIER = 0.92;  // active position multiplier — still "toward the side", out of the text's way
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = THREE.MathUtils.lerp;
 const smoothstep = (x) => x * x * (3 - 2 * x);
@@ -29,32 +40,37 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true,
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 0.96; // slightly crushed — a closed garage, not a showroom
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.35, 8.2);
-camera.lookAt(0, -0.1, 0);
+const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0.4, 9.4);
+camera.lookAt(0, -0.15, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.045).texture;
+if ('environmentIntensity' in scene) scene.environmentIntensity = 0.55;
 
-/* ---------------- Lighting ---------------- */
+/* ---------------- Lighting — a single warm lamp in a dark garage ---------------- */
+/* Concept: near-black ambient, one warm overhead spotlight doing almost
+   all the work (like a workshop lamp), a whisper of cool fill/rim just
+   enough to keep the chrome legible against the dark. */
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+scene.add(new THREE.AmbientLight(0xffcf9e, 0.10));
 
-const key = new THREE.DirectionalLight(0xfff3e0, 1.6);
-key.position.set(4, 5, 6);
-scene.add(key);
+const garageLamp = new THREE.SpotLight(0xffb066, 3.6, 40, Math.PI / 5.2, 0.55, 1.3);
+garageLamp.position.set(0, 7.4, 2.2);
+garageLamp.target.position.set(0, -1, 0);
+scene.add(garageLamp, garageLamp.target);
 
-const rim = new THREE.DirectionalLight(0xaecbff, 1.4);
-rim.position.set(-5, 3, -5);
-scene.add(rim);
+const warmFill = new THREE.DirectionalLight(0xffdcb0, 0.32);
+warmFill.position.set(-3, 1.6, 4);
+scene.add(warmFill);
 
-const fill = new THREE.DirectionalLight(0xffffff, 0.5);
-fill.position.set(-3, 2, 4);
-scene.add(fill);
+const coolRim = new THREE.DirectionalLight(0x8fa0b3, 0.30);
+coolRim.position.set(-5, 3, -5);
+scene.add(coolRim);
 
 /* ---------------- Contact-shadow texture (procedural, no asset needed) ---------------- */
 
@@ -64,8 +80,8 @@ function makeShadowTexture() {
   c.width = c.height = size;
   const ctx = c.getContext('2d');
   const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  g.addColorStop(0, 'rgba(0,0,0,0.55)');
-  g.addColorStop(0.6, 'rgba(0,0,0,0.25)');
+  g.addColorStop(0, 'rgba(0,0,0,0.62)');
+  g.addColorStop(0.6, 'rgba(0,0,0,0.28)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, size, size);
@@ -74,7 +90,7 @@ function makeShadowTexture() {
   return tex;
 }
 const shadowTex = makeShadowTexture();
-const shadowGeo = new THREE.PlaneGeometry(3.4, 3.4);
+const shadowGeo = new THREE.PlaneGeometry(4.6, 4.6);
 
 /* ---------------- Loading ---------------- */
 
@@ -98,7 +114,7 @@ function reportProgress() {
   pctEl.textContent = pct + '%';
 }
 
-/* Each entry: { wrapper, materials:[], weight, opacity, x, rotY, scale } */
+/* Each entry: { outer, materials:[], shadowMat, side, frontTurn, weight } */
 const rigs = new Array(MODELS.length).fill(null);
 
 function frameModel(root) {
@@ -128,8 +144,9 @@ function collectMaterials(root) {
   root.traverse((obj) => {
     if (obj.isMesh) {
       obj.material = obj.material.clone();
-      obj.material.transparent = true;
-      obj.material.depthWrite = true;
+      obj.material.transparent = false;
+      obj.material.opacity = 1;
+      if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.15;
       obj.frustumCulled = false;
       mats.push(obj.material);
     }
@@ -145,12 +162,11 @@ function loadOne(i) {
       (gltf) => {
         const wrapper = frameModel(gltf.scene);
         const materials = collectMaterials(gltf.scene);
-        materials.forEach((m) => (m.opacity = 0));
 
         const outer = new THREE.Group();
         outer.add(wrapper);
-        outer.rotation.y = cfg.facing;
-        outer.position.x = cfg.side * SIDE_OFFSET * 1.4;
+        outer.rotation.y = cfg.frontTurn;
+        outer.position.x = cfg.side * SIDE_OFFSET * REST_MULTIPLIER;
 
         const shadow = new THREE.Mesh(
           shadowGeo,
@@ -167,9 +183,8 @@ function loadOne(i) {
           materials,
           shadowMat: shadow.material,
           side: cfg.side,
-          facing: cfg.facing,
+          frontTurn: cfg.frontTurn,
           weight: 0,
-          opacity: 0,
         };
 
         progressByFile[i] = 1;
@@ -202,10 +217,12 @@ Promise.all(MODELS.map((_, i) => loadOne(i))).then(() => {
 
 /* ============================================================
    Scroll → weight mapping
-   Each model section's proximity to the viewport centre
-   produces a 0..1 weight. Sections overlap in weight as you
-   scroll, which is what gives the crossfade its "replaced by
-   the next one" continuity instead of a hard cut.
+   Each model section's proximity to the viewport centre produces
+   a 0..1 weight. That weight drives ONLY position and scale — the
+   cars stay fully opaque throughout. The outgoing model slides
+   away toward its resting position off‑screen while the next one
+   slides in from its own resting position, so the "replacement"
+   reads as a clean slide, never a fade.
    ============================================================ */
 
 const sections = Array.from(document.querySelectorAll('.model-section'));
@@ -272,7 +289,7 @@ document.getElementById('back-top').addEventListener('click', () => {
 
 /* ---------------- Subtle mouse parallax on the camera ---------------- */
 
-let mouseX = 0, mouseY = 0, camX = 0, camY = 0.35;
+let mouseX = 0, mouseY = 0, camX = 0, camY = 0.4;
 if (!prefersReducedMotion) {
   window.addEventListener('pointermove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -292,36 +309,33 @@ function animate() {
   const t = clock.getElapsedTime();
 
   // camera parallax
-  camX = lerp(camX, mouseX * 0.35, 0.05);
-  camY = lerp(camY, 0.35 - mouseY * 0.12, 0.05);
+  camX = lerp(camX, mouseX * 0.32, 0.05);
+  camY = lerp(camY, 0.4 - mouseY * 0.1, 0.05);
   camera.position.x = camX;
   camera.position.y = camY;
-  camera.lookAt(0, -0.1, 0);
+  camera.lookAt(0, -0.15, 0);
 
   rigs.forEach((rig, i) => {
     if (!rig) return;
     rig.weight = lerp(rig.weight, targetWeights[i], 1 - Math.pow(0.001, delta));
     const w = rig.weight;
 
-    // position: rest further out-of-frame, settle slightly inward when active
-    const restX = rig.side * SIDE_OFFSET * 1.55;
-    const activeX = rig.side * SIDE_OFFSET * 0.92;
+    // position: rest fully off-screen to the side, slide in "toward the side" (not centre) when active
+    const restX = rig.side * SIDE_OFFSET * REST_MULTIPLIER;
+    const activeX = rig.side * SIDE_OFFSET * ACTIVE_MULTIPLIER;
     rig.outer.position.x = lerp(restX, activeX, w);
-    rig.outer.position.y = -0.15 + Math.sin(t * 0.6 + i) * 0.02 * (0.3 + w);
+    rig.outer.position.y = -0.15 + Math.sin(t * 0.5 + i) * 0.015 * (0.3 + w);
 
-    // scale: small when idle, full presence when active
-    const s = lerp(0.72, 1, w);
+    // scale: a touch smaller while off-stage, full presence when active
+    const s = lerp(0.82, 1, w);
     rig.outer.scale.setScalar(s);
 
-    // rotation: gentle continuous turntable, amplified while active
-    rig.outer.rotation.y = rig.facing + Math.sin(t * 0.18 + i * 1.7) * 0.12 + (prefersReducedMotion ? 0 : t * 0.05 * (0.15 + w * 0.5));
+    // rotation: fixed front-facing turn plus only a small, bounded sway —
+    // the front of the car is always what's on screen, it never spins to a profile/rear view
+    rig.outer.rotation.y = rig.frontTurn + Math.sin(t * 0.3 + i * 1.7) * 0.05;
 
-    // opacity crossfade
-    rig.opacity = lerp(rig.opacity, w, 1 - Math.pow(0.001, delta));
-    rig.materials.forEach((m) => (m.opacity = rig.opacity));
-    rig.shadowMat.opacity = rig.opacity * 0.8;
-
-    rig.outer.visible = rig.opacity > 0.004;
+    // fully opaque always — the transition is a slide, never a fade
+    rig.shadowMat.opacity = lerp(rig.shadowMat.opacity, w * 0.85, 1 - Math.pow(0.001, delta));
   });
 
   renderer.render(scene, camera);
