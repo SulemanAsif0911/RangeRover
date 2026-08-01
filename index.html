@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Range Rover — A Legacy in Chrome</title>
+<meta name="description" content="An interactive, scroll-driven showcase of four defining Range Rover models, rendered in real time 3D.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient carbon-fibre backdrop -->
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Preloader -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-mark chrome-text" data-text="RR">RR</div>
+      <div class="loader-bar"><span id="loader-fill"></span></div>
+      <div class="loader-label">
+        <span id="loader-status">ASSEMBLING THE LEGEND</span>
+        <span id="loader-pct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed 3D stage -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <!-- Fixed chrome header -->
+  <header class="site-header">
+    <div class="brand">RANGE&nbsp;ROVER<span>·</span>HERITAGE</div>
+    <nav class="dot-nav" id="dot-nav">
+      <button class="dot" data-target="hero" aria-label="Introduction"><i></i><em>Intro</em></button>
+      <button class="dot" data-target="m0" aria-label="Supercharged 2006"><i></i><em>2006</em></button>
+      <button class="dot" data-target="m1" aria-label="Evoque 2011"><i></i><em>2011</em></button>
+      <button class="dot" data-target="m2" aria-label="Velar"><i></i><em>Velar</em></button>
+      <button class="dot" data-target="m3" aria-label="SV Coupe"><i></i><em>SV&nbsp;Coupe</em></button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">A CENTURY OF ENGLISH ENGINEERING</p>
+        <h1 class="chrome-text hero-title" data-text="RANGE ROVER">RANGE ROVER</h1>
+        <p class="hero-sub">Four defining chapters. One unbroken idea of luxury on any terrain.</p>
+      </div>
+      <div class="scroll-cue">
+        <span>SCROLL</span>
+        <div class="scroll-line"><i></i></div>
+      </div>
+    </section>
+
+    <!-- MODEL 1 — 2006 Supercharged -->
+    <section class="model-section text-right" id="m0" data-model="0">
+      <div class="model-info">
+        <p class="model-year">2005 — 2009 · THIRD GENERATION</p>
+        <h2 class="chrome-text model-name" data-text="SUPERCHARGED">SUPERCHARGED</h2>
+        <p class="model-tag">The one that proved luxury and capability were never opposites.</p>
+        <p class="model-copy">Under the L322's commanding bonnet sat a 4.2‑litre supercharged V8 — a quiet declaration that the Range Rover could out‑accelerate saloons while still fording a river. It set the template every luxury SUV since has been measured against.</p>
+        <ul class="spec-list">
+          <li><span>Engine</span><span>4.2L Supercharged V8</span></li>
+          <li><span>Power</span><span>400 hp</span></li>
+          <li><span>0–60 mph</span><span>7.5 sec</span></li>
+          <li><span>Top speed</span><span>140 mph</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODEL 2 — 2011 Evoque -->
+    <section class="model-section text-left" id="m1" data-model="1">
+      <div class="model-info">
+        <p class="model-year">2011 — 2018 · FIRST GENERATION</p>
+        <h2 class="chrome-text model-name" data-text="EVOQUE">EVOQUE</h2>
+        <p class="model-tag">Proof that presence was never about size.</p>
+        <p class="model-copy">The Evoque compressed everything the marque stood for into a coupé‑like silhouette built for the city as readily as the countryside. It brought a new, younger audience to the badge without asking the badge to compromise.</p>
+        <ul class="spec-list">
+          <li><span>Engine</span><span>2.0L Turbo Si4</span></li>
+          <li><span>Power</span><span>240 hp</span></li>
+          <li><span>0–60 mph</span><span>7.1 sec</span></li>
+          <li><span>Body style</span><span>3‑Door Coupé</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODEL 3 — Velar -->
+    <section class="model-section text-right" id="m2" data-model="2">
+      <div class="model-info">
+        <p class="model-year">2017 — PRESENT · DESIGN‑LED</p>
+        <h2 class="chrome-text model-name" data-text="VELAR">VELAR</h2>
+        <p class="model-tag">The art of reduction — a language distilled to its essence.</p>
+        <p class="model-copy">Named for the original 1969 prototypes, the Velar slots between Evoque and full‑size Range Rover with flush door handles, a minimalist cabin, and surfacing so clean it reads more gallery piece than SUV.</p>
+        <ul class="spec-list">
+          <li><span>Engine</span><span>2.0L Turbocharged Ingenium</span></li>
+          <li><span>Power</span><span>250 — 550 hp range</span></li>
+          <li><span>Drive</span><span>Intelligent All‑Wheel Drive</span></li>
+          <li><span>Signature</span><span>Flush Deployable Handles</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODEL 4 — SV Coupe -->
+    <section class="model-section text-left" id="m3" data-model="3">
+      <div class="model-info">
+        <p class="model-year">2018 · 999 EXAMPLES WORLDWIDE</p>
+        <h2 class="chrome-text model-name" data-text="SV COUPÉ">SV COUPÉ</h2>
+        <p class="model-tag">Only 999 were made. Fewer still will ever be seen.</p>
+        <p class="model-copy">A two‑door reimagining of the full‑size Range Rover, hand finished by the Special Vehicle Operations team. Widened haunches, a lowered roofline, and a supercharged V8 make it the rarest, most theatrical expression of the name.</p>
+        <ul class="spec-list">
+          <li><span>Engine</span><span>5.0L Supercharged V8</span></li>
+          <li><span>Power</span><span>557 hp</span></li>
+          <li><span>0–60 mph</span><span>5.0 sec</span></li>
+          <li><span>Production</span><span>999 Units</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- OUTRO -->
+    <section class="outro" id="outro">
+      <p class="eyebrow">FOUR MODELS. ONE PHILOSOPHY.</p>
+      <h2 class="chrome-text outro-title" data-text="STILL ABOVE THE REST">STILL ABOVE THE REST</h2>
+      <button class="back-top" id="back-top">BACK TO THE TOP ↑</button>
+      <p class="fine-print">A fan‑made interactive showcase. Range Rover and all model names are trademarks of Jaguar Land Rover.</p>
+    </section>
+
+  </main>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="script.js"></script>
+</body>
+</html>
