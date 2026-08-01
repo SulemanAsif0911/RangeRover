@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Range Rover — A Lineage</title>
-<meta name="description" content="A scroll-driven, real-time 3D chronicle of the Range Rover — from the original Classic to the Sport to a bespoke Midnight edition.">
+<meta name="description" content="A scroll-driven, real-time 3D chronicle of the Range Rover — seven defining models across five decades.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   <div class="backdrop" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <!-- Preloader -->
+  <!-- Preloader — only blocks on the FIRST model; the rest load in the background -->
   <div class="loader" id="loader">
     <div class="loader-inner">
       <div class="loader-mark">RANGE ROVER</div>
@@ -38,20 +38,33 @@
 
   <!-- Vertical timeline -->
   <nav class="timeline-nav" id="timeline-nav">
-    <button class="tdot" data-target="ch1" data-label="ORIGIN — 1970"><i></i><em>ORIGIN — 1970</em></button>
-    <button class="tdot" data-target="ch2" data-label="PERFORMANCE — 2018"><i></i><em>PERFORMANCE — 2018</em></button>
-    <button class="tdot" data-target="ch3" data-label="PRESENT — TODAY"><i></i><em>PRESENT — TODAY</em></button>
+    <button class="tdot" data-target="ch1"><i></i><em>ORIGIN — 1970</em></button>
+    <button class="tdot" data-target="ch2"><i></i><em>THE EXECUTIVE — 2006</em></button>
+    <button class="tdot" data-target="ch3"><i></i><em>COMPACT ICON — 2011</em></button>
+    <button class="tdot" data-target="ch4"><i></i><em>DESIGN‑LED — 2017</em></button>
+    <button class="tdot" data-target="ch5"><i></i><em>PERFORMANCE — 2018</em></button>
+    <button class="tdot" data-target="ch6"><i></i><em>999 MADE — 2018</em></button>
+    <button class="tdot" data-target="ch7"><i></i><em>PRESENT — TODAY</em></button>
   </nav>
 
   <main>
 
-    <!-- CHAPTER 01 -->
-    <section class="chapter" id="ch1" data-model="0">
+    <!-- INTRO -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <p class="hero-kicker">A RANGE ROVER RETROSPECTIVE</p>
+        <h1 class="chrome-text hero-title" data-text="RANGE ROVER">RANGE ROVER</h1>
+        <p class="hero-sub">Seven defining models. Five decades. One unbroken idea of what a luxury four‑by‑four should be.</p>
+      </div>
+    </section>
+
+    <!-- CHAPTER 01 — Classic -->
+    <section class="chapter text-left" id="ch1" data-model="0">
       <div class="chapter-info">
         <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 01 — 1970</div>
-        <div class="chapter-counter">01 / 03</div>
+        <div class="chapter-counter">01 / 07</div>
         <p class="chapter-tag">WHERE IT BEGAN</p>
-        <h2 class="chapter-title">RANGE ROVER<br>CLASSIC</h2>
+        <h2 class="chrome-text chapter-title" data-text="RANGE ROVER CLASSIC">RANGE ROVER<br>CLASSIC</h2>
         <p class="chapter-copy">Conceived for farmers and estate owners who needed a vehicle equally at home fording a river or arriving at the county show, the original Range Rover accidentally invented an entire category. Coil springs and permanent four‑wheel drive gave it the manners of a saloon car everywhere else it went.</p>
         <div class="spec-grid">
           <div><p class="spec-label">Engine</p><p class="spec-value">3.5L V8</p></div>
@@ -64,13 +77,70 @@
       </div>
     </section>
 
-    <!-- CHAPTER 02 -->
-    <section class="chapter" id="ch2" data-model="1">
+    <!-- CHAPTER 02 — Supercharged -->
+    <section class="chapter text-right" id="ch2" data-model="1">
       <div class="chapter-info">
-        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 02 — 2018</div>
-        <div class="chapter-counter">02 / 03</div>
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 02 — 2006</div>
+        <div class="chapter-counter">02 / 07</div>
+        <p class="chapter-tag">THE EXECUTIVE TURN</p>
+        <h2 class="chrome-text chapter-title" data-text="SUPERCHARGED">SUPERCHARGED</h2>
+        <p class="chapter-copy">Under the L322's commanding bonnet sat a 4.2‑litre supercharged V8 — a quiet declaration that the Range Rover could out‑accelerate saloons while still fording a river. It set the template every luxury SUV since has been measured against.</p>
+        <div class="spec-grid">
+          <div><p class="spec-label">Engine</p><p class="spec-value">4.2L Supercharged V8</p></div>
+          <div><p class="spec-label">Power</p><p class="spec-value">400 hp</p></div>
+          <div><p class="spec-label">0–60 mph</p><p class="spec-value">7.5 sec</p></div>
+          <div><p class="spec-label">Top speed</p><p class="spec-value">140 mph</p></div>
+          <div><p class="spec-label">Drive</p><p class="spec-value">Permanent 4WD</p></div>
+          <div><p class="spec-label">Built</p><p class="spec-value">2005 – 2009</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 03 — Evoque -->
+    <section class="chapter text-left" id="ch3" data-model="2">
+      <div class="chapter-info">
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 03 — 2011</div>
+        <div class="chapter-counter">03 / 07</div>
+        <p class="chapter-tag">PROOF SIZE NEVER MATTERED</p>
+        <h2 class="chrome-text chapter-title" data-text="EVOQUE">EVOQUE</h2>
+        <p class="chapter-copy">The Evoque compressed everything the marque stood for into a coupé‑like silhouette built for the city as readily as the countryside. It brought a new, younger audience to the badge without asking the badge to compromise.</p>
+        <div class="spec-grid">
+          <div><p class="spec-label">Engine</p><p class="spec-value">2.0L Turbo Si4</p></div>
+          <div><p class="spec-label">Power</p><p class="spec-value">240 hp</p></div>
+          <div><p class="spec-label">0–60 mph</p><p class="spec-value">7.1 sec</p></div>
+          <div><p class="spec-label">Body style</p><p class="spec-value">3‑Door Coupé</p></div>
+          <div><p class="spec-label">Drive</p><p class="spec-value">Front / All‑Wheel Drive</p></div>
+          <div><p class="spec-label">Built</p><p class="spec-value">2011 – 2018</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 04 — Velar -->
+    <section class="chapter text-right" id="ch4" data-model="3">
+      <div class="chapter-info">
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 04 — 2017</div>
+        <div class="chapter-counter">04 / 07</div>
+        <p class="chapter-tag">THE ART OF REDUCTION</p>
+        <h2 class="chrome-text chapter-title" data-text="VELAR">VELAR</h2>
+        <p class="chapter-copy">Named for the original 1969 prototypes, the Velar slots between Evoque and full‑size Range Rover with flush door handles, a minimalist cabin, and surfacing so clean it reads more gallery piece than SUV.</p>
+        <div class="spec-grid">
+          <div><p class="spec-label">Engine</p><p class="spec-value">2.0L Turbocharged Ingenium</p></div>
+          <div><p class="spec-label">Power</p><p class="spec-value">250 – 550 hp range</p></div>
+          <div><p class="spec-label">Drive</p><p class="spec-value">Intelligent AWD</p></div>
+          <div><p class="spec-label">Signature</p><p class="spec-value">Flush Deployable Handles</p></div>
+          <div><p class="spec-label">Cabin</p><p class="spec-value">Dual‑Screen Touch Pro Duo</p></div>
+          <div><p class="spec-label">Built</p><p class="spec-value">2017 – Present</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 05 — Sport 2018 -->
+    <section class="chapter text-left" id="ch5" data-model="4">
+      <div class="chapter-info">
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 05 — 2018</div>
+        <div class="chapter-counter">05 / 07</div>
         <p class="chapter-tag">BORN TO CORNER</p>
-        <h2 class="chapter-title">RANGE ROVER<br>SPORT</h2>
+        <h2 class="chrome-text chapter-title" data-text="RANGE ROVER SPORT">RANGE ROVER<br>SPORT</h2>
         <p class="chapter-copy">Lower, stiffer, and considerably more eager to be hurried, the Sport gave the range a performance‑first sibling — the presence of a Range Rover with the reflexes of something two classes smaller. A supercharged V8 turned "sport" from a suffix into a promise.</p>
         <div class="spec-grid">
           <div><p class="spec-label">Engine</p><p class="spec-value">5.0L Supercharged V8</p></div>
@@ -83,13 +153,32 @@
       </div>
     </section>
 
-    <!-- CHAPTER 03 -->
-    <section class="chapter" id="ch3" data-model="2">
+    <!-- CHAPTER 06 — SV Coupé -->
+    <section class="chapter text-right" id="ch6" data-model="5">
       <div class="chapter-info">
-        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 03 — TODAY</div>
-        <div class="chapter-counter">03 / 03</div>
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 06 — 2018</div>
+        <div class="chapter-counter">06 / 07</div>
+        <p class="chapter-tag">999 EXAMPLES WORLDWIDE</p>
+        <h2 class="chrome-text chapter-title" data-text="SV COUPÉ">SV COUPÉ</h2>
+        <p class="chapter-copy">A two‑door reimagining of the full‑size Range Rover, hand finished by the Special Vehicle Operations team. Widened haunches, a lowered roofline, and a supercharged V8 make it the rarest, most theatrical expression of the name.</p>
+        <div class="spec-grid">
+          <div><p class="spec-label">Engine</p><p class="spec-value">5.0L Supercharged V8</p></div>
+          <div><p class="spec-label">Power</p><p class="spec-value">557 hp</p></div>
+          <div><p class="spec-label">0–60 mph</p><p class="spec-value">5.0 sec</p></div>
+          <div><p class="spec-label">Production</p><p class="spec-value">999 Units</p></div>
+          <div><p class="spec-label">Body style</p><p class="spec-value">2‑Door Coupé</p></div>
+          <div><p class="spec-label">Built</p><p class="spec-value">2018 Only</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 07 — Midnight -->
+    <section class="chapter text-left" id="ch7" data-model="6">
+      <div class="chapter-info">
+        <div class="chapter-meta"><i class="meta-dot"></i>CHAPTER 07 — TODAY</div>
+        <div class="chapter-counter">07 / 07</div>
         <p class="chapter-tag">THE FINAL WORD</p>
-        <h2 class="chapter-title">RANGE ROVER<br>MIDNIGHT</h2>
+        <h2 class="chrome-text chapter-title" data-text="RANGE ROVER MIDNIGHT">RANGE ROVER<br>MIDNIGHT</h2>
         <p class="chapter-copy">A bespoke Midnight finish over the current full‑size body — the point in the lineage where the conversation stops being about numbers. Deep, near‑black paint, satin trim, and a cabin built to executive brief. It doesn't need to raise its voice.</p>
         <div class="spec-grid">
           <div><p class="spec-label">Finish</p><p class="spec-value">Bespoke Midnight Blue</p></div>
@@ -104,8 +193,8 @@
 
     <!-- OUTRO -->
     <section class="outro" id="outro">
-      <p class="chapter-tag outro-tag">THREE CHAPTERS. ONE IDEA.</p>
-      <h2 class="outro-title">STILL ABOVE THE REST</h2>
+      <p class="chapter-tag outro-tag">SEVEN CHAPTERS. ONE IDEA.</p>
+      <h2 class="chrome-text outro-title" data-text="STILL ABOVE THE REST">STILL ABOVE THE REST</h2>
       <button class="back-top" id="back-top">BACK TO THE TOP ↑</button>
       <p class="fine-print">A fan‑made interactive showcase. Range Rover and all model names are trademarks of Jaguar Land Rover.</p>
     </section>
