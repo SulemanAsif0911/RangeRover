@@ -29,9 +29,9 @@ const MODELS = [
 ];
 
 const TURN_TOWARD_TEXT = 0.5; // how far each car turns off dead-on-front — always rotating toward its own chapter's text panel
-const TARGET_SIZE = 3.1;   // normalized world-space size of the largest dimension — natural, photo-like proportion
-const SIDE_DIST   = 1.55;  // how far toward its side the active car sits
-const REST_DIST   = 5.4;   // fully off-screen resting distance (multiplied by each model's own `side`)
+const TARGET_SIZE = 6.4;   // normalized world-space size of the largest dimension — big, frame-filling presence
+const SIDE_DIST   = 1.4;   // how far toward its side the active car sits
+const REST_DIST   = 6.2;   // fully off-screen resting distance (multiplied by each model's own `side`)
 const VISIBLE_THRESHOLD = 0.02; // below this weight a car is fully hidden — never more than ~2 rendered at once
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -50,8 +50,8 @@ renderer.toneMappingExposure = 1.05;
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.32, 9);
+const camera = new THREE.PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0.3, 8.2);
 camera.lookAt(0, -0.1, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -97,7 +97,7 @@ function makeShadowTexture() {
   return tex;
 }
 const shadowTex = makeShadowTexture();
-const shadowGeo = new THREE.PlaneGeometry(5.3, 5.3);
+const shadowGeo = new THREE.PlaneGeometry(8, 8);
 
 /* ---------------- Loading ---------------- */
 /* Only the FIRST model blocks the preloader. The rest load quietly
