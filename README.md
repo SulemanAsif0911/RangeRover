@@ -1,9 +1,9 @@
 # Range Rover — A Lineage
 
-A scroll-driven, real-time 3D chronicle of seven Range Rovers — Classic,
-Supercharged, Evoque, Velar, Sport, SV Coupé, and a bespoke Midnight edition —
-in chronological chapters with alternating left/right staging, a chrome/
-platinum identity (no borrowed colours), and a vertical chapter timeline.
+A scroll-driven, real-time 3D chronicle of seven Range Rovers, in this order:
+Classic → Supercharged → Evoque → Midnight → Sport → Velar → SV Coupé —
+staged with alternating left/right entrances, a chrome/platinum identity,
+and a vertical chapter timeline.
 
 ## Files
 
@@ -29,33 +29,38 @@ Then open the printed local address in a modern browser (WebGL2 required).
 ## How it works
 
 - **Alternating entrances**: each chapter's car enters from, and rests on,
-  the opposite side of the previous one (right, left, right, left…), and the
-  text panel always sits on the opposite side from the car so they never
-  overlap. Off-stage, a car is fully off-screen; only when its chapter
-  scrolls near the centre of the viewport does it slide in to its docked
-  spot, at full size, in a 3/4 hero angle.
+  the opposite side of the previous one, and the text panel always sits on
+  the opposite side from the car so they never overlap.
+- **Bonnet faces the text**: rather than a fixed hero angle applied the same
+  way to every model, each car's rotation turns it specifically toward its
+  own chapter's text panel — cars on the right turn left toward the copy,
+  cars on the left turn right toward it.
+- **Zoom**: achieved with a narrower field of view and the camera held
+  further back (a "longer lens"), which reads as genuine automotive-photo
+  magnification rather than just scaling geometry up.
 - **Only ever ~1-2 of the seven models are actually rendered** at any given
-  moment (everything else is hidden outright, not just moved off-screen),
-  which is what keeps scrolling smooth despite the total asset size.
-- **Progressive loading**: with ~80MB across seven files, waiting for all of
-  them before showing anything would be a bad first impression. Only chapter
-  one's model blocks the preloader; the other six quietly finish loading in
-  the background right after the page becomes interactive. If you scroll to
-  a later chapter before its file has finished, the car simply appears the
-  moment it's ready.
+  moment (everything else is hidden outright), which is what keeps
+  scrolling smooth despite the total asset size — combined with a bloom
+  post-process pass that's cheap precisely because so little is on screen
+  at once.
+- **Progressive loading**: only chapter one's model blocks the preloader;
+  the other six finish loading quietly in the background right after the
+  page becomes interactive.
+- **Texture fix**: materials are no longer forced fully opaque. That earlier
+  "reduce quality" pass had set every material's `transparent` to `false`,
+  which broke glass — windows rendered as solid colour blocks instead of
+  tinted, see-through glass. Materials are now left exactly as authored.
 - **Front-facing orientation** was derived, not eyeballed, by parsing each
   GLB's actual node/material names and geometry — named wheel nodes
   (`_fr/_fl/_rl/_rr`, `FL/FR/BL/BR Wheel`), grille, bumper, and boot meshes
   gave a verifiable answer for six of the seven files. The Midnight Blue
-  file has no named parts at all (generic `Object_N` meshes), so its
-  rotation is a best-effort match to the Classic's axis — if it ever shows
-  its rear, add `Math.PI` to its `frontTurn` value in `script.js`.
+  file has no named parts at all, so its rotation is a best-effort match to
+  the Classic's axis — if it ever shows its rear, add `Math.PI` to its
+  `frontTurn` value in `script.js`.
 - Lighting is a neutral chrome-studio setup (key + fill + rim + a faint
-  ground bounce, plus a generated room-environment map) — tuned for legible
-  paint reflections without leaning on any one accent colour.
-- Textures are deliberately kept simple (low anisotropy, no extra mipmaps)
-  and antialiasing is off, trading a little edge crispness for a
-  meaningfully smoother scroll across seven heavy files.
+  ground bounce, plus a generated room-environment map) with a small bloom
+  pass that lifts specular hotspots on chrome and glass for a more
+  "hyper-real" showroom look, without being gaudy about it.
 - Fully respects `prefers-reduced-motion`.
 
 ## Notes
