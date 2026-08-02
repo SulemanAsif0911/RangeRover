@@ -2,10 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 /* ============================================================
    CONFIG — one entry per model, in chapter order.
@@ -30,13 +26,12 @@ const MODELS = [
   { file: 'assets/models/range-rover-midnight-blue.glb', side: -1, frontTurn: 0 },               // 04 — Midnight
   { file: 'assets/models/range-rover-sport-2018.glb',    side:  1, frontTurn: -Math.PI / 2 },    // 05 — Sport, 2018
   { file: 'assets/models/velar.glb',                      side: -1, frontTurn: Math.PI },        // 06 — Velar, 2017
-  { file: 'assets/models/sv-coupe.glb',                   side:  1, frontTurn: Math.PI / 2 },    // 07 — SV Coupé, 2018
 ];
 
-const TURN_TOWARD_TEXT = 0.58; // how far each car turns off dead-on-front, always rotating toward its own chapter's text panel
-const TARGET_SIZE = 4.6;       // normalized world-space size of the largest dimension — big, magnified presence
-const SIDE_DIST   = 1.95;      // how far toward its side the active car sits
-const REST_DIST   = 7.2;       // fully off-screen resting distance (multiplied by each model's own `side`)
+const TURN_TOWARD_TEXT = 0.58; // how far each car turns off dead-on-front — always rotating toward its own chapter's text panel
+const TARGET_SIZE = 4.7;   // normalized world-space size of the largest dimension — magnified
+const SIDE_DIST   = 1.95;  // how far toward its side the active car sits
+const REST_DIST   = 7.2;   // fully off-screen resting distance (multiplied by each model's own `side`)
 const VISIBLE_THRESHOLD = 0.02; // below this weight a car is fully hidden — never more than ~2 rendered at once
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -45,47 +40,29 @@ const smoothstep = (x) => x * x * (3 - 2 * x);
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------------- Renderer / scene / camera ---------------- */
-/* A narrower field of view + a camera held further back reads as a
-   longer lens — the "zoomed in", slightly compressed look of real
-   automotive photography — rather than just scaling geometry up. */
 
 const canvas = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.08;
+renderer.toneMappingExposure = 1.05;
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(21, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.32, 12.5);
+const camera = new THREE.PerspectiveCamera(22, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0.32, 12.3);
 camera.lookAt(0, -0.1, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.035).texture;
-if ('environmentIntensity' in scene) scene.environmentIntensity = 0.95;
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+if ('environmentIntensity' in scene) scene.environmentIntensity = 0.85;
 
-/* Bloom picks out bright specular hotspots on chrome/glass/paint —
-   a small, cheap post-process pass (one render target, one model
-   ever visible) that goes a long way toward a "hyper-real" showroom
-   render instead of a flat game-engine look. */
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.32,   // strength — subtle, just lifts hotspots
-  0.55,   // radius
-  0.88    // threshold — only the brightest highlights bloom
-);
-composer.addPass(bloomPass);
-composer.addPass(new OutputPass());
+/* ---------------- Lighting — neutral chrome studio, no borrowed colour ---------------- */
 
-/* ---------------- Lighting — neutral chrome studio ---------------- */
+scene.add(new THREE.AmbientLight(0xffffff, 0.16));
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.15));
-
-const key = new THREE.SpotLight(0xf5f7ff, 3.6, 40, Math.PI / 5, 0.5, 1.1);
+const key = new THREE.SpotLight(0xf3f5ff, 3.4, 40, Math.PI / 5, 0.55, 1.15);
 key.position.set(2.2, 6.5, 5);
 key.target.position.set(0, -0.6, 0);
 scene.add(key, key.target);
@@ -94,7 +71,7 @@ const fill = new THREE.DirectionalLight(0xe7eaee, 0.42);
 fill.position.set(-4, 1.8, 3.5);
 scene.add(fill);
 
-const rim = new THREE.DirectionalLight(0xd7dade, 0.95);
+const rim = new THREE.DirectionalLight(0xd7dade, 0.85);
 rim.position.set(-3.5, 2.2, -5);
 scene.add(rim);
 
@@ -120,12 +97,12 @@ function makeShadowTexture() {
   return tex;
 }
 const shadowTex = makeShadowTexture();
-const shadowGeo = new THREE.PlaneGeometry(5.2, 5.2);
+const shadowGeo = new THREE.PlaneGeometry(5.3, 5.3);
 
 /* ---------------- Loading ---------------- */
-/* Only the FIRST model blocks the preloader. The other six load
-   quietly in the background right after, so ~80MB of combined
-   assets never means a multi-second stall before the page is usable. */
+/* Only the FIRST model blocks the preloader. The rest load quietly
+   in the background right after, so there's no multi-second stall
+   before the page is usable. */
 
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
@@ -173,12 +150,21 @@ function collectMaterials(root) {
   root.traverse((obj) => {
     if (obj.isMesh) {
       obj.material = obj.material.clone();
-      // NOTE: we deliberately do NOT touch transparent/opacity here —
-      // forcing every material opaque previously broke glass (windows
-      // rendered as solid colour blocks instead of tinted/see-through).
-      // Cars never fade in this design (only slide), so leaving each
-      // material exactly as authored is both correct and simplest.
-      if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.3;
+      // NOTE: transparent/opacity are intentionally left exactly as
+      // authored — forcing every material opaque previously broke
+      // glass (windows rendered as solid colour blocks). Cars never
+      // fade in this design anyway (only slide), so there's no need
+      // to touch either property.
+      if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.25;
+      // lighter textures for a smoother scroll across several heavy models
+      ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap'].forEach((slot) => {
+        const tex = obj.material[slot];
+        if (tex) {
+          tex.anisotropy = 1;
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+        }
+      });
       obj.frustumCulled = false;
       mats.push(obj.material);
     }
@@ -209,9 +195,8 @@ function loadOne(i, onProgress) {
 
         scene.add(outer);
 
-        // bonnet turns toward this car's own text panel: side 1 (car right,
-        // text left) turns left toward it; side -1 (car left, text right)
-        // turns right toward it.
+        // side 1 = car docks right, text left → turn left toward it.
+        // side -1 = car docks left, text right → turn right toward it.
         const baseRotation = cfg.frontTurn - cfg.side * TURN_TOWARD_TEXT;
 
         rigs[i] = {
@@ -297,7 +282,6 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  composer.setSize(window.innerWidth, window.innerHeight);
   onScrollOrResize();
 });
 
@@ -314,7 +298,7 @@ document.getElementById('back-top').addEventListener('click', () => {
 
 /* ---------------- Subtle mouse parallax ---------------- */
 
-let mouseX = 0, mouseY = 0, camX = 0, camY = 0.32;
+let mouseX = 0, mouseY = 0, camX = 0, camY = 0.35;
 if (!prefersReducedMotion) {
   window.addEventListener('pointermove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -326,7 +310,6 @@ if (!prefersReducedMotion) {
 
 const clock = new THREE.Clock();
 renderer.setSize(window.innerWidth, window.innerHeight);
-composer.setSize(window.innerWidth, window.innerHeight);
 onScrollOrResize();
 
 function animate() {
@@ -334,8 +317,8 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   const t = clock.getElapsedTime();
 
-  camX = lerp(camX, mouseX * 0.22, 0.05);
-  camY = lerp(camY, 0.32 - mouseY * 0.08, 0.05);
+  camX = lerp(camX, mouseX * 0.3, 0.05);
+  camY = lerp(camY, 0.35 - mouseY * 0.1, 0.05);
   camera.position.x = camX;
   camera.position.y = camY;
   camera.lookAt(0, -0.1, 0);
@@ -350,7 +333,7 @@ function animate() {
     rig.outer.position.x = lerp(restX, activeX, w);
     rig.outer.position.y = -0.15 + Math.sin(t * 0.5 + i) * 0.015 * (0.3 + w);
 
-    const s = lerp(0.86, 1, w);
+    const s = lerp(0.84, 1, w);
     rig.outer.scale.setScalar(s);
 
     rig.outer.rotation.y = rig.baseRotation + Math.sin(t * 0.3 + i * 1.7) * 0.04;
@@ -359,6 +342,6 @@ function animate() {
     rig.outer.visible = w > VISIBLE_THRESHOLD;
   });
 
-  composer.render();
+  renderer.render(scene, camera);
 }
 animate();
