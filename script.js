@@ -28,10 +28,10 @@ const MODELS = [
   { file: 'assets/models/velar.glb',                      side: -1, frontTurn: Math.PI },        // 06 — Velar, 2017
 ];
 
-const TURN_TOWARD_TEXT = 0.58; // how far each car turns off dead-on-front — always rotating toward its own chapter's text panel
-const TARGET_SIZE = 4.7;   // normalized world-space size of the largest dimension — magnified
-const SIDE_DIST   = 1.95;  // how far toward its side the active car sits
-const REST_DIST   = 7.2;   // fully off-screen resting distance (multiplied by each model's own `side`)
+const TURN_TOWARD_TEXT = 0.5; // how far each car turns off dead-on-front — always rotating toward its own chapter's text panel
+const TARGET_SIZE = 3.1;   // normalized world-space size of the largest dimension — natural, photo-like proportion
+const SIDE_DIST   = 1.55;  // how far toward its side the active car sits
+const REST_DIST   = 5.4;   // fully off-screen resting distance (multiplied by each model's own `side`)
 const VISIBLE_THRESHOLD = 0.02; // below this weight a car is fully hidden — never more than ~2 rendered at once
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -50,8 +50,8 @@ renderer.toneMappingExposure = 1.05;
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(22, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.32, 12.3);
+const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0.32, 9);
 camera.lookAt(0, -0.1, 0);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -60,22 +60,22 @@ if ('environmentIntensity' in scene) scene.environmentIntensity = 0.85;
 
 /* ---------------- Lighting — neutral chrome studio, no borrowed colour ---------------- */
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.16));
+scene.add(new THREE.AmbientLight(0xffffff, 0.28));
 
-const key = new THREE.SpotLight(0xf3f5ff, 3.4, 40, Math.PI / 5, 0.55, 1.15);
-key.position.set(2.2, 6.5, 5);
+const key = new THREE.SpotLight(0xf3f5ff, 2.3, 40, Math.PI / 3.6, 0.85, 1.4);
+key.position.set(2.5, 6, 5.5);
 key.target.position.set(0, -0.6, 0);
 scene.add(key, key.target);
 
-const fill = new THREE.DirectionalLight(0xe7eaee, 0.42);
+const fill = new THREE.DirectionalLight(0xe7eaee, 0.62);
 fill.position.set(-4, 1.8, 3.5);
 scene.add(fill);
 
-const rim = new THREE.DirectionalLight(0xd7dade, 0.85);
+const rim = new THREE.DirectionalLight(0xd7dade, 0.6);
 rim.position.set(-3.5, 2.2, -5);
 scene.add(rim);
 
-const groundBounce = new THREE.DirectionalLight(0xaeb2b8, 0.16);
+const groundBounce = new THREE.DirectionalLight(0xaeb2b8, 0.2);
 groundBounce.position.set(0, -3, 2);
 scene.add(groundBounce);
 
@@ -155,16 +155,7 @@ function collectMaterials(root) {
       // glass (windows rendered as solid colour blocks). Cars never
       // fade in this design anyway (only slide), so there's no need
       // to touch either property.
-      if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.25;
-      // lighter textures for a smoother scroll across several heavy models
-      ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap'].forEach((slot) => {
-        const tex = obj.material[slot];
-        if (tex) {
-          tex.anisotropy = 1;
-          tex.generateMipmaps = false;
-          tex.minFilter = THREE.LinearFilter;
-        }
-      });
+      if ('envMapIntensity' in obj.material) obj.material.envMapIntensity = 1.2;
       obj.frustumCulled = false;
       mats.push(obj.material);
     }
